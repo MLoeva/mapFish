@@ -13,11 +13,6 @@
 <body>
     <div id=entete>
         <a href="/"><img src="images/logo.png" alt=""></a>
-        <ul class=navigation>
-            <li><a href="/portfolio">Portfolio</a></li>
-            <li><a href="/about">A propos</a></li>
-            <li><a href="/contact">Contact</a></li>
-        </ul>
     </div>
 
 

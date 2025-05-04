@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 require_once 'flight/Flight.php';
 
-//debut modifs
 // Configuration directe de PostgreSQL
 $link = pg_connect("host=localhost port=5432 dbname=bdd_mapFish user=postgres password=postgres");
 if (!$link) {
@@ -14,6 +13,13 @@ Flight::set('link', $link);
 // Fonction helper pour faciliter l'accès à la connexion
 Flight::map('db', function() {
     return Flight::get('link');
+});
+
+// Début de session
+Flight::before('start', function() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 });
 
 // Routes
@@ -30,10 +36,9 @@ Flight::route('POST /login', function(){
     $user = pg_fetch_assoc($result);
     
     if ($user && password_verify($password, $user['password'])) {
-        session_start();
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_email'] = $user['email'];
-        Flight::redirect('/dashboard');
+        $_SESSION['user_pseudo'] = $user['pseudo'];
+        Flight::redirect('/page_accueil');
     } else {
         Flight::render('login.php', ['error' => 'Email ou mot de passe incorrect']);
     }
@@ -77,9 +82,6 @@ Flight::route('/signin', function() {
     Flight::render('signin.php');
 });
 
-// ... (le reste de vos routes)
-
-//fin modfs
 Flight::route('/page_accueil', function() {
     Flight::render('page_accueil.php');
 });
@@ -98,7 +100,5 @@ Flight::route('/contact', function() {
 
 Flight::start();
 
-// Démarrer Flight
-Flight::start();
 
 ?>
