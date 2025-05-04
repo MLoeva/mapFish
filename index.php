@@ -26,7 +26,7 @@ Flight::route('POST /login', function(){
     $email = Flight::request()->data->email;
     $password = Flight::request()->data->password;
     
-    $result = pg_query_params(Flight::db(), "SELECT * FROM users WHERE email = $1", array($email));
+    $result = pg_query_params(Flight::db(), "SELECT * FROM utilisateurs WHERE email = $1", array($email));
     $user = pg_fetch_assoc($result);
     
     if ($user && password_verify($password, $user['password'])) {
@@ -40,20 +40,21 @@ Flight::route('POST /login', function(){
 });
 
 // Exemple d'inscription adapté pour PostgreSQL
-Flight::route('POST /register', function(){
+Flight::route('POST /signin', function(){
     $email = Flight::request()->data->email;
+    $pseudo = Flight::request()->data->pseudo;
     $password = Flight::request()->data->password;
     $confirm_password = Flight::request()->data->confirm_password;
     
     if ($password !== $confirm_password) {
-        Flight::render('register.php', ['error' => 'Les mots de passe ne correspondent pas']);
+        Flight::render('signin.php', ['error' => 'Les mots de passe ne correspondent pas']);
         return;
     }
     
     // Vérification si l'email existe déjà
-    $result = pg_query_params(Flight::db(), "SELECT id FROM users WHERE email = $1", array($email));
+    $result = pg_query_params(Flight::db(), "SELECT id FROM utilisateurs WHERE email = $1", array($email));
     if (pg_fetch_assoc($result)) {
-        Flight::render('register.php', ['error' => 'Cet email est déjà utilisé']);
+        Flight::render('signin.php', ['error' => 'Cet email est déjà utilisé']);
         return;
     }
     
@@ -61,15 +62,19 @@ Flight::route('POST /register', function(){
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $result = pg_query_params(
         Flight::db(), 
-        "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id", 
-        array($email, $hashed_password)
+        "INSERT INTO utilisateurs (email, password, pseudo) VALUES ($1, $2, $3) RETURNING id", 
+        array($email, $hashed_password, $pseudo)
     );
     
     if ($result) {
         Flight::render('login.php', ['success' => 'Compte créé avec succès. Connectez-vous maintenant.']);
     } else {
-        Flight::render('register.php', ['error' => 'Erreur lors de la création du compte']);
+        Flight::render('signin.php', ['error' => 'Erreur lors de la création du compte']);
     }
+});
+
+Flight::route('/signin', function() {
+    Flight::render('signin.php');
 });
 
 // ... (le reste de vos routes)

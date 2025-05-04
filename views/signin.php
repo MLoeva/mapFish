@@ -13,12 +13,17 @@
             <div class="alert error"><?= $error ?></div>
         <?php endif; ?>
         
-        <form action="/register" method="post">
+        <form action="/signin" method="post">
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
             </div>
             
+            <div class="form-group">
+                <label for="pseudo">Pseudo:</label>
+                <input type="pseudo" id="pseudo" name="pseudo" required>
+            </div>
+
             <div class="form-group">
                 <label for="password">Mot de passe:</label>
                 <input type="password" id="password" name="password" required>
